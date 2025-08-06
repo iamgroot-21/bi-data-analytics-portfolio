@@ -2,7 +2,7 @@
 
 ## Ayush Man Shrestha
 **Senior BI Developer & Data Analyst**  
-📧 simanggaidashrestha@gmail.com | 📱 (240) 389-4753  
+📧 simanggaidashrestha@gmail.com | 
 🔗 [LinkedIn](https://linkedin.com/in/ayushmanshrestha)
 
 ---
