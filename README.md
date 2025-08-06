@@ -97,7 +97,6 @@ Each project includes:
 
 Ready to discuss how these skills can benefit your organization?  
 📧 **Email**: simanggaidashrestha@gmail.com  
-📱 **Phone**: (240) 389-4753  
 🔗 **LinkedIn**: [Ayush Man Shrestha](https://linkedin.com/in/ayushmanshrestha)
 
 ---
