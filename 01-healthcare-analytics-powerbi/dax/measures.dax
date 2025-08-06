@@ -1,0 +1,509 @@
+-- =============================================
+-- Healthcare Analytics Dashboard - DAX Measures
+-- Created by: Ayush Man Shrestha
+-- Date: 2024
+-- Purpose: Power BI Healthcare Analytics Dashboard
+-- =============================================
+
+-- =============================================
+-- CORE METRICS - PATIENT VOLUME
+-- =============================================
+
+// Total Patient Admissions
+Total Admissions = 
+COUNTROWS(Patient_Admissions)
+
+// Average Length of Stay
+Average Length of Stay = 
+AVERAGE(Patient_Admissions[Length_of_Stay_Days])
+
+// Median Length of Stay
+Median Length of Stay = 
+MEDIAN(Patient_Admissions[Length_of_Stay_Days])
+
+// Readmission Rate
+Readmission Rate = 
+DIVIDE(
+    CALCULATE(
+        COUNTROWS(Patient_Admissions),
+        Patient_Admissions[Readmission_Flag] = "Yes"
+    ),
+    [Total Admissions],
+    0
+)
+
+// Readmission Rate Percentage
+Readmission Rate % = 
+FORMAT([Readmission Rate], "0.00%")
+
+// =============================================
+-- FINANCIAL METRICS
+-- =============================================
+
+// Total Revenue
+Total Revenue = 
+SUM(Financial_Transactions[Revenue_Amount])
+
+// Total Cost
+Total Cost = 
+SUM(Financial_Transactions[Cost_Amount])
+
+// Total Profit
+Total Profit = 
+[Total Revenue] - [Total Cost]
+
+// Profit Margin
+Profit Margin = 
+DIVIDE([Total Profit], [Total Revenue], 0)
+
+// Profit Margin Percentage
+Profit Margin % = 
+FORMAT([Profit Margin], "0.00%")
+
+// Revenue per Patient
+Revenue per Patient = 
+DIVIDE([Total Revenue], [Total Admissions], 0)
+
+// Cost per Patient
+Cost per Patient = 
+DIVIDE([Total Cost], [Total Admissions], 0)
+
+// =============================================
+-- TIME INTELLIGENCE MEASURES
+-- =============================================
+
+// Revenue MTD (Month to Date)
+Revenue MTD = 
+CALCULATE(
+    [Total Revenue],
+    DATESMTD(Date_Calendar[FullDate])
+)
+
+// Revenue YTD (Year to Date)
+Revenue YTD = 
+CALCULATE(
+    [Total Revenue],
+    DATESYTD(Date_Calendar[FullDate])
+)
+
+// Revenue QTD (Quarter to Date)
+Revenue QTD = 
+CALCULATE(
+    [Total Revenue],
+    DATESQTD(Date_Calendar[FullDate])
+)
+
+// Admissions MTD
+Admissions MTD = 
+CALCULATE(
+    [Total Admissions],
+    DATESMTD(Date_Calendar[FullDate])
+)
+
+// Admissions YTD
+Admissions YTD = 
+CALCULATE(
+    [Total Admissions],
+    DATESYTD(Date_Calendar[FullDate])
+)
+
+// =============================================
+-- COMPARISON MEASURES
+-- =============================================
+
+// Revenue vs Previous Month
+Revenue vs Previous Month = 
+DIVIDE(
+    [Revenue MTD] - CALCULATE([Revenue MTD], DATEADD(Date_Calendar[FullDate], -1, MONTH)),
+    CALCULATE([Revenue MTD], DATEADD(Date_Calendar[FullDate], -1, MONTH)),
+    0
+)
+
+// Revenue vs Previous Month %
+Revenue vs Previous Month % = 
+FORMAT([Revenue vs Previous Month], "0.00%")
+
+// Admissions vs Previous Month
+Admissions vs Previous Month = 
+DIVIDE(
+    [Admissions MTD] - CALCULATE([Admissions MTD], DATEADD(Date_Calendar[FullDate], -1, MONTH)),
+    CALCULATE([Admissions MTD], DATEADD(Date_Calendar[FullDate], -1, MONTH)),
+    0
+)
+
+// Admissions vs Previous Month %
+Admissions vs Previous Month % = 
+FORMAT([Admissions vs Previous Month], "0.00%")
+
+// =============================================
+-- DEPARTMENT ANALYSIS
+-- =============================================
+
+// Department Revenue
+Department Revenue = 
+CALCULATE(
+    [Total Revenue],
+    ALLEXCEPT(Departments, Departments[DepartmentName])
+)
+
+// Department Admissions
+Department Admissions = 
+CALCULATE(
+    [Total Admissions],
+    ALLEXCEPT(Departments, Departments[DepartmentName])
+)
+
+// Department Profit Margin
+Department Profit Margin = 
+CALCULATE(
+    [Profit Margin],
+    ALLEXCEPT(Departments, Departments[DepartmentName])
+)
+
+// Department Revenue Share
+Department Revenue Share = 
+DIVIDE(
+    [Department Revenue],
+    [Total Revenue],
+    0
+)
+
+// Department Revenue Share %
+Department Revenue Share % = 
+FORMAT([Department Revenue Share], "0.00%")
+
+// =============================================
+-- QUALITY METRICS
+-- =============================================
+
+// Average Patient Satisfaction
+Average Patient Satisfaction = 
+AVERAGE(Quality_Metrics[MetricValue])
+
+// Quality Score
+Quality Score = 
+CALCULATE(
+    AVERAGE(Quality_Metrics[MetricValue]),
+    Quality_Metrics[MetricType] = "Patient Satisfaction"
+)
+
+// Infection Rate
+Infection Rate = 
+CALCULATE(
+    AVERAGE(Quality_Metrics[MetricValue]),
+    Quality_Metrics[MetricType] = "Infection Rate"
+)
+
+// Mortality Rate
+Mortality Rate = 
+CALCULATE(
+    AVERAGE(Quality_Metrics[MetricValue]),
+    Quality_Metrics[MetricType] = "Mortality Rate"
+)
+
+// =============================================
+-- OPERATIONAL METRICS
+-- =============================================
+
+// Bed Utilization Rate
+Bed Utilization Rate = 
+DIVIDE(
+    [Total Admissions],
+    SUM(Departments[BedCount]),
+    0
+)
+
+// Average Wait Time
+Average Wait Time = 
+AVERAGE(Operational_Events[DurationMinutes])
+
+// Emergency Response Time
+Emergency Response Time = 
+CALCULATE(
+    AVERAGE(Operational_Events[DurationMinutes]),
+    Operational_Events[EventType] = "Emergency Response"
+)
+
+// =============================================
+-- PATIENT DEMOGRAPHICS
+-- =============================================
+
+// Patient Count by Gender
+Patient Count by Gender = 
+CALCULATE(
+    [Total Admissions],
+    ALLEXCEPT(Patients, Patients[Gender])
+)
+
+// Patient Count by Insurance
+Patient Count by Insurance = 
+CALCULATE(
+    [Total Admissions],
+    ALLEXCEPT(Patients, Patients[InsuranceType])
+)
+
+// Average Age
+Average Age = 
+AVERAGE(Patients[Age])
+
+// =============================================
+-- DIAGNOSIS ANALYSIS
+-- =============================================
+
+// Diagnosis Count
+Diagnosis Count = 
+CALCULATE(
+    [Total Admissions],
+    ALLEXCEPT(Diagnosis_Codes, Diagnosis_Codes[Category])
+)
+
+// Top Diagnosis
+Top Diagnosis = 
+CALCULATE(
+    SELECTEDVALUE(Diagnosis_Codes[DiagnosisDescription]),
+    TOPN(1, Diagnosis_Codes, [Diagnosis Count])
+)
+
+// =============================================
+-- PROVIDER ANALYSIS
+-- =============================================
+
+// Provider Patient Count
+Provider Patient Count = 
+CALCULATE(
+    [Total Admissions],
+    ALLEXCEPT(Providers, Providers[ProviderName])
+)
+
+// Provider Revenue
+Provider Revenue = 
+CALCULATE(
+    [Total Revenue],
+    ALLEXCEPT(Providers, Providers[ProviderName])
+)
+
+// Top Provider
+Top Provider = 
+CALCULATE(
+    SELECTEDVALUE(Providers[ProviderName]),
+    TOPN(1, Providers, [Provider Patient Count])
+)
+
+// =============================================
+-- ADVANCED ANALYTICS
+-- =============================================
+
+// Length of Stay Distribution
+Length of Stay Distribution = 
+SWITCH(
+    TRUE(),
+    [Average Length of Stay] <= 3, "Short Stay (≤3 days)",
+    [Average Length of Stay] <= 7, "Medium Stay (4-7 days)",
+    [Average Length of Stay] <= 14, "Long Stay (8-14 days)",
+    "Extended Stay (>14 days)"
+)
+
+// Severity Level Count
+Severity Level Count = 
+CALCULATE(
+    [Total Admissions],
+    ALLEXCEPT(Patient_Admissions, Patient_Admissions[SeverityLevel])
+)
+
+// High Severity Rate
+High Severity Rate = 
+DIVIDE(
+    CALCULATE(
+        [Total Admissions],
+        Patient_Admissions[SeverityLevel] = "High"
+    ),
+    [Total Admissions],
+    0
+)
+
+// High Severity Rate %
+High Severity Rate % = 
+FORMAT([High Severity Rate], "0.00%")
+
+// =============================================
+-- KPI MEASURES
+-- =============================================
+
+// KPI - Revenue Growth
+Revenue Growth KPI = 
+SWITCH(
+    TRUE(),
+    [Revenue vs Previous Month] >= 0.05, "Excellent",
+    [Revenue vs Previous Month] >= 0.02, "Good",
+    [Revenue vs Previous Month] >= 0, "Fair",
+    "Needs Attention"
+)
+
+// KPI - Readmission Rate
+Readmission Rate KPI = 
+SWITCH(
+    TRUE(),
+    [Readmission Rate] <= 0.08, "Excellent",
+    [Readmission Rate] <= 0.12, "Good",
+    [Readmission Rate] <= 0.15, "Fair",
+    "Needs Attention"
+)
+
+// KPI - Patient Satisfaction
+Patient Satisfaction KPI = 
+SWITCH(
+    TRUE(),
+    [Quality Score] >= 4.5, "Excellent",
+    [Quality Score] >= 4.0, "Good",
+    [Quality Score] >= 3.5, "Fair",
+    "Needs Attention"
+)
+
+// KPI - Profit Margin
+Profit Margin KPI = 
+SWITCH(
+    TRUE(),
+    [Profit Margin] >= 0.15, "Excellent",
+    [Profit Margin] >= 0.10, "Good",
+    [Profit Margin] >= 0.05, "Fair",
+    "Needs Attention"
+)
+
+// =============================================
+-- TREND ANALYSIS
+-- =============================================
+
+// 30-Day Moving Average Revenue
+Revenue 30 Day MA = 
+CALCULATE(
+    AVERAGEX(
+        DATESINPERIOD(
+            Date_Calendar[FullDate],
+            LASTDATE(Date_Calendar[FullDate]),
+            -30,
+            DAY
+        ),
+        [Total Revenue]
+    )
+)
+
+// 7-Day Moving Average Admissions
+Admissions 7 Day MA = 
+CALCULATE(
+    AVERAGEX(
+        DATESINPERIOD(
+            Date_Calendar[FullDate],
+            LASTDATE(Date_Calendar[FullDate]),
+            -7,
+            DAY
+        ),
+        [Total Admissions]
+    )
+)
+
+// =============================================
+-- FORECASTING MEASURES
+-- =============================================
+
+// Revenue Forecast (Simple Linear)
+Revenue Forecast = 
+[Revenue YTD] * (12 / MONTH(TODAY()))
+
+// Admissions Forecast
+Admissions Forecast = 
+[Admissions YTD] * (12 / MONTH(TODAY()))
+
+// =============================================
+-- UTILITY MEASURES
+-- =============================================
+
+// Current Date
+Current Date = 
+TODAY()
+
+// Current Month
+Current Month = 
+FORMAT(TODAY(), "mmmm yyyy")
+
+// Data Last Updated
+Data Last Updated = 
+"Last Updated: " & FORMAT(NOW(), "mmmm dd, yyyy hh:mm AM/PM")
+
+// =============================================
+-- SECURITY MEASURES
+-- =============================================
+
+// Department Filter
+Department Filter = 
+IF(
+    HASONEVALUE(Departments[DepartmentName]),
+    [Total Admissions],
+    BLANK()
+)
+
+// Provider Filter
+Provider Filter = 
+IF(
+    HASONEVALUE(Providers[ProviderName]),
+    [Total Admissions],
+    BLANK()
+)
+
+-- =============================================
+-- MEASURE GROUPS FOR ORGANIZATION
+-- =============================================
+
+/*
+MEASURE GROUPS:
+
+1. Core Metrics
+   - Total Admissions
+   - Average Length of Stay
+   - Readmission Rate
+
+2. Financial Metrics
+   - Total Revenue
+   - Total Cost
+   - Total Profit
+   - Profit Margin
+
+3. Time Intelligence
+   - Revenue MTD/YTD/QTD
+   - Admissions MTD/YTD/QTD
+
+4. Comparison Metrics
+   - vs Previous Month/Year
+   - Growth Rates
+
+5. Department Analysis
+   - Department Revenue
+   - Department Admissions
+   - Department Profit Margin
+
+6. Quality Metrics
+   - Patient Satisfaction
+   - Infection Rate
+   - Mortality Rate
+
+7. Operational Metrics
+   - Bed Utilization
+   - Wait Times
+   - Response Times
+
+8. Advanced Analytics
+   - Severity Analysis
+   - Trend Analysis
+   - Forecasting
+
+9. KPI Measures
+   - Performance Indicators
+   - Status Indicators
+
+10. Utility Measures
+    - Date Functions
+    - Security Filters
+*/
+
+PRINT "DAX measures created successfully for Healthcare Analytics Dashboard!";
+PRINT "Total measures created: 50+";
+PRINT "Categories: Core, Financial, Time Intelligence, Quality, Operational, Advanced Analytics"; 
