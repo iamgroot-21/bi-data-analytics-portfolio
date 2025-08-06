@@ -22,34 +22,34 @@ This repository contains real-world BI and data analytics projects showcasing ex
 
 ## 📊 Portfolio Projects
 
-### 1. 🏥 Healthcare Analytics Dashboard (Power BI)
+### 1. Healthcare Analytics Dashboard (Power BI)
 **Industry**: Healthcare  
 **Tools**: Power BI, DAX, SQL Server  
 **Focus**: Patient outcomes, cost analysis, operational efficiency
 
-### 2. 📱 Telecom Customer Analytics (Looker)
+### 2. Telecom Customer Analytics (Looker)
 **Industry**: Telecommunications  
 **Tools**: Looker, LookML, BigQuery  
 **Focus**: Customer churn, ARPU analysis, network performance
 
-### 3. 🏦 Financial Services Dashboard (Tableau)
+### 3. Financial Services Dashboard (Tableau)
 **Industry**: Banking & Finance  
 **Tools**: Tableau, PostgreSQL, Python  
 **Focus**: Risk assessment, portfolio performance, regulatory compliance
 
-### 4. 🛒 E-commerce Sales Analytics (Power BI)
+### 4. E-commerce Sales Analytics (Power BI)
 **Industry**: Retail  
 **Tools**: Power BI, DAX, SQL Server  
 **Focus**: Sales performance, inventory management, customer segmentation
 
-### 5. 🏭 Manufacturing Operations Dashboard (Looker)
+### 5. Manufacturing Operations Dashboard (Looker)
 **Industry**: Manufacturing  
 **Tools**: Looker, LookML, Snowflake  
 **Focus**: Production efficiency, quality control, supply chain optimization
 
 ---
 
-## 🚀 Key Features Demonstrated
+## Key Features Demonstrated
 
 ### Data Modeling & Architecture
 - Complex data models with multiple fact/dimension tables
